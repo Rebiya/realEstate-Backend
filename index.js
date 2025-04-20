@@ -23,7 +23,7 @@ app.use(express.json());
 app.use(expressSanitizer()); // Fix: Correct sanitizer middleware
 
 // Import and use routes
-const router = require("./routes/index.js");
+const router = require("./routes/index.routes.js");
 app.use("/api", router);
 
 // Set port
