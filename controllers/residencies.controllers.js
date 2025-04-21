@@ -28,52 +28,54 @@ const getResidencyById = async (req, res) => {
 const createResidency = async (req, res) => {
   try {
     const residency = await residenciesService.createResidency(req.body);
+    // console.log(residency)
     res.status(201).json(residency);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+
 //update residency
 const updateResidency = async (req, res) => {
   try {
-    const residency = await residenciesService.updateResidency(
-      req.params.id,
-      req.body
-    );
-    if (!residency) {
+    const { id } = req.params;
+    const updatedResidency = await residenciesService.updateResidency(id, req.body);
+    
+    if (!updatedResidency) {
       return res.status(404).json({ message: "Residency not found" });
     }
-    res.status(200).json(residency);
+    
+    res.status(200).json({ 
+      success: true,
+      message: "Residency updated successfully",
+      data: updatedResidency
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+
 //delete residency
 const deleteResidency = async (req, res) => {
   try {
     const residency = await residenciesService.deleteResidency(req.params.id);
+    
     if (!residency) {
-      return res.status(404).json({ message: "Residency not found" });
+      const errorMessage = `Residency not found with ID: ${req.params.id}`;
+      console.log(errorMessage);
+      return res.status(404).json({ message: errorMessage });
     }
-    res.status(204).json();
+    
+    console.log(`Successfully deleted residency with ID: ${req.params.id}`);
+    return res.status(204).end();
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error('Controller error:', error);
+    return res.status(500).json({ 
+      message: `Error deleting residency: ${error.message}` 
+    });
   }
 };
-//get residencies by user email
-const getResidenciesByUserEmail = async (req, res) => {
-  try {
-    const residencies = await residenciesService.getResidenciesByUserEmail(
-      req.params.email
-    );
-    if (!residencies) {
-      return res.status(404).json({ message: "Residency not found" });
-    }
-    res.status(200).json(residencies);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
+
 
 
 
@@ -85,5 +87,4 @@ module.exports = {
   createResidency,
   updateResidency,
   deleteResidency,
-  getResidenciesByUserEmail,
 };
