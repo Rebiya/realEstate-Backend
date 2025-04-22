@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS users (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
--- 2. Now create residencies table with foreign key to facilities
+-- 2. reate residencies table
 CREATE TABLE IF NOT EXISTS residencies (
     id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
     title VARCHAR(55) NOT NULL,
@@ -28,17 +28,7 @@ CREATE TABLE IF NOT EXISTS residencies (
     FOREIGN KEY (user_email) REFERENCES users(email)
 );
 
--- 3. Create other tables
-CREATE TABLE IF NOT EXISTS bookings (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    property_id VARCHAR(36) NOT NULL,
-    user_email VARCHAR(100) NOT NULL,
-    visit_date TIMESTAMP NOT NULL,
-    booking_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    status ENUM('confirmed', 'cancelled', 'completed') DEFAULT 'confirmed',
-    FOREIGN KEY (property_id) REFERENCES residencies(id),
-    FOREIGN KEY (user_email) REFERENCES users(email)
-);
+-- 3. Create favorites tables
 
 CREATE TABLE IF NOT EXISTS favorites (
     user_email VARCHAR(100) NOT NULL,
