@@ -5,13 +5,27 @@ async function getAllUsers() {
     const query = `SELECT * FROM users`;
     return await db.query(query);
 }
+
 async function registerUser(userData) {
     const { email, auth0_id, fname, lname, phone_number } = userData;
     const query = `INSERT INTO users (email, auth0_id, fname, lname, phone_number) VALUES (?, ?, ?, ?, ?)`;
     return await db.query(query, [email, auth0_id, fname, lname, phone_number]);
 }
 
+async function updateUser(userId, userData) {
+    const { email, fname, lname, phone_number } = userData;
+    const query = `UPDATE users SET email = ?, fname = ?, lname = ?, phone_number = ? WHERE auth0_id = ?`;
+    return await db.query(query, [email, fname, lname, phone_number, userId]);
+}
+
+async function deleteUser(userId) {
+    const query = `DELETE FROM users WHERE auth0_id = ?`;
+    return await db.query(query, [userId]);
+}
+
 module.exports = {
     getAllUsers,
-    registerUser
+    registerUser,
+    updateUser,
+    deleteUser
 };

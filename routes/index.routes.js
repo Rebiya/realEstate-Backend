@@ -4,7 +4,7 @@ const router = express.Router();
 
 //import routes
 const migrateRoutes = require("./migrate.routes.js");
-const userRoutes = require("./users.routes.js");
+const userRoutes = require("./users.router.js");
 const residenciesRoutes = require("./residencies.routes.js");
 const favoritesRoutes = require("./favorites.routes.js");
 
