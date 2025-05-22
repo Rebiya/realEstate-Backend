@@ -8,11 +8,14 @@ const query = `SELECT * FROM residencies`;
 return await db.query(query);
 };
 //get residency by id using relational procedural database
+//get residency by id using relational procedural database
 const getResidencyById = async (id) => {
+  console.log("Fetching residency with ID:", id); // Add this for debugging
   const query = `SELECT * FROM residencies WHERE id = ?`;
-  return await db.query(query, [id]);
- };
-
+  const result = await db.query(query, [id]);
+  console.log("Database result:", result); // Add this for debugging
+  return result;
+};
 // Service function with destructuring
 const createResidency = async (residencyData) => {
     const {

@@ -1,31 +1,66 @@
 const db = require('../DB/dbconfig.js');
 
-// Get all users
-async function getAllUsers() {
-    const query = `SELECT * FROM users`;
-    return await db.query(query);
-}
-
-async function registerUser(userData) {
-    const { email, auth0_id, fname, lname, phone_number } = userData;
-    const query = `INSERT INTO users (email, auth0_id, fname, lname, phone_number) VALUES (?, ?, ?, ?, ?)`;
-    return await db.query(query, [email, auth0_id, fname, lname, phone_number]);
-}
-
-async function updateUser(userId, userData) {
-    const { email, fname, lname, phone_number } = userData;
-    const query = `UPDATE users SET email = ?, fname = ?, lname = ?, phone_number = ? WHERE auth0_id = ?`;
-    return await db.query(query, [email, fname, lname, phone_number, userId]);
-}
-
-async function deleteUser(userId) {
-    const query = `DELETE FROM users WHERE auth0_id = ?`;
-    return await db.query(query, [userId]);
-}
-
 module.exports = {
-    getAllUsers,
-    registerUser,
-    updateUser,
-    deleteUser
+  getAllUsers: async () => {
+    try {
+      return await db.query('SELECT * FROM users');
+    } catch (error) {
+      throw new Error('Failed to fetch users');
+    }
+  },
+
+  registerUser: async (userData) => {
+    try {
+      const { email, auth0_id = null, fname, lname, phone_number } = userData;
+      const result = await db.query(
+        `INSERT INTO users (email, auth0_id, fname, lname, phone_number) 
+         VALUES (?, ?, ?, ?, ?)`,
+        [email, auth0_id, fname, lname, phone_number]
+      );
+      return result;
+    } catch (error) {
+      if (error.code === 'ER_DUP_ENTRY') {
+        throw { status: 409, message: 'Email already exists' };
+      }
+      throw { status: 500, message: 'Failed to register user' };
+    }
+  },
+
+  updateUser: async (uuid, userData) => {
+    try {
+      const { email, fname, lname, phone_number } = userData;
+      const result = await db.query(
+        `UPDATE users 
+         SET email = ?, fname = ?, lname = ?, phone_number = ? 
+         WHERE uuid = ?`,
+        [email, fname, lname, phone_number, uuid]
+      );
+      
+      if (result.affectedRows === 0) {
+        throw { status: 404, message: 'User not found' };
+      }
+      return result;
+    } catch (error) {
+      if (error.code === 'ER_DUP_ENTRY') {
+        throw { status: 409, message: 'Email already exists' };
+      }
+      throw { status: error.status || 500, message: error.message || 'Failed to update user' };
+    }
+  },
+
+  deleteUser: async (uuid) => {
+    try {
+      const result = await db.query(
+        'DELETE FROM users WHERE uuid = ?',
+        [uuid]
+      );
+      
+      if (result.affectedRows === 0) {
+        throw { status: 404, message: 'User not found' };
+      }
+      return result;
+    } catch (error) {
+      throw { status: error.status || 500, message: error.message || 'Failed to delete user' };
+    }
+  }
 };

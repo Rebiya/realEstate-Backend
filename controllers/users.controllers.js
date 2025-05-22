@@ -1,59 +1,61 @@
-//import the user service
-const userService = require('../services/users.services.js');
+const userService = require('../services/users.services');
 
-// Get all users
-const getAllUsers = async (req, res) => {
+module.exports = {
+  getAllUsers: async (req, res) => {
     try {
       const users = await userService.getAllUsers();
-      return res.status(200).json({ users });
+      res.status(200).json(users);
     } catch (error) {
-      console.error("Error fetching users:", error);
-      return res.status(500).json({ message: "Error fetching users", error });
+      res.status(500).json({ 
+        message: error.message || 'Failed to fetch users',
+        error: error 
+      });
     }
-  };
+  },
 
-const registerUser = async (req, res) => {
+  registerUser: async (req, res) => {
     try {
       const user = await userService.registerUser(req.body);
-      return res.status(201).json({ user });
+      res.status(201).json({ 
+        message: 'User registered successfully',
+        user 
+      });
     } catch (error) {
-      console.error("Error registering user:", error);
-      return res.status(500).json({ message: "Error registering user", error });
+      res.status(error.status || 500).json({ 
+        message: error.message || 'Error registering user',
+        error: error 
+      });
     }
-  };
+  },
 
-const updateUser = async (req, res) => {
+  updateUser: async (req, res) => {
     try {
-        const { userId } = req.params;
-        const user = await userService.updateUser(userId, req.body);
-        if (!user) {
-            return res.status(404).json({ message: "User not found" });
-        }
-        return res.status(200).json({ message: "User updated successfully", user });
+      const { uuid } = req.params;
+      const result = await userService.updateUser(uuid, req.body);
+      res.status(200).json({ 
+        message: 'User updated successfully',
+        user: result 
+      });
     } catch (error) {
-        console.error("Error updating user:", error);
-        return res.status(500).json({ message: "Error updating user", error });
+      res.status(error.status || 500).json({ 
+        message: error.message || 'Error updating user',
+        error: error 
+      });
     }
-};
+  },
 
-const deleteUser = async (req, res) => {
+  deleteUser: async (req, res) => {
     try {
-        const { userId } = req.params;
-        const result = await userService.deleteUser(userId);
-        if (!result) {
-            return res.status(404).json({ message: "User not found" });
-        }
-        return res.status(200).json({ message: "User deleted successfully" });
+      const { uuid } = req.params;
+      await userService.deleteUser(uuid);
+      res.status(200).json({ 
+        message: 'User deleted successfully' 
+      });
     } catch (error) {
-        console.error("Error deleting user:", error);
-        return res.status(500).json({ message: "Error deleting user", error });
+      res.status(error.status || 500).json({ 
+        message: error.message || 'Error deleting user',
+        error: error 
+      });
     }
+  }
 };
-
-//export the getAllUsers function
-module.exports = {
-    getAllUsers,
-    registerUser,
-    updateUser,
-    deleteUser
-  };
